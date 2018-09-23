@@ -1,5 +1,6 @@
 import javafx.util.Pair;
-
+import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class PassengerHandler {
@@ -23,6 +24,29 @@ public class PassengerHandler {
         personTrainMap = new TreeMap<>(Comparator.comparingInt(Pair::getValue));
         //здесь я использовал конструктор с передачей компаратора
         //так как Pair не реализует интерфейс Comparable
+    }
+    PassengerHandler(String source){
+        dataFromCSV = new ArrayList<>();
+        personTrainMap = new TreeMap<>(Comparator.comparingInt(Pair::getValue));
+
+        try {
+            FileReader fr = new FileReader(source);
+
+            /**
+             * тут очень спорный вопрос, но так как я читал из файла txt, то я использовал такую кодировку
+             * возможно у этой проблемы есть более элегантное решение
+             */
+            Scanner sc = new Scanner(Paths.get(source), "Cp1251");
+            while(sc.hasNextLine()) {
+                String s = sc.nextLine();
+                read(new Passenger(s));
+                System.out.println(s);
+            }
+
+            fr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -50,15 +74,37 @@ public class PassengerHandler {
      * построение таблицы, по имеющимся данным
      */
     public void printTable() {
-        StringBuilder sb = new StringBuilder();
-        System.out.println(",,1,2");
-
-        //эту операцию можно вынести в отдельную функцию,
-        //которая строит строку для конкретного person из таблицы, где person всего лишь комбинация (пол, возраст)
+        System.out.println(",,1,2\n");
         for(Pair<String, Integer> person : personTrainMap.keySet())
-            System.out.println(person.getKey() + ','
-                    + person.getValue() + ','
-                    + personTrainMap.get(person).getKey() + ','
-                    + personTrainMap.get(person).getValue());
+            System.out.print(makeString(person));
+    }
+    public void printTable(String path){
+
+        try {
+            FileWriter fOut = new FileWriter(path);
+
+            fOut.write(",,1,2\n");
+            for(Pair<String, Integer> person : personTrainMap.keySet()) {
+                fOut.write(makeString(person));
+            }
+            fOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(1);
+        }
+
+    }
+
+    private String makeString(Pair<String, Integer> person){
+        StringBuilder sb = new StringBuilder();
+        sb.append(person.getKey())
+                .append(',')
+                .append(person.getValue())
+                .append(',')
+                .append(personTrainMap.get(person).getKey())
+                .append(',')
+                .append(personTrainMap.get(person).getValue())
+                .append('\n');
+        return String.valueOf(sb);
     }
 }

@@ -2,10 +2,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
+
 
 public class Passenger {
 
-    enum fields{
+    private enum fields{
         FIO,
         Birthday,
         Gender,
@@ -19,20 +21,13 @@ public class Passenger {
         DepartureTown,
         ArrivingTown
     }
-    SimpleDateFormat ft = new SimpleDateFormat("dd.MM.yyyy");
+    private SimpleDateFormat ft = new SimpleDateFormat("dd.MM.yyyy");
     private ArrayList<String> dataFromString = new ArrayList<>();
 
     Passenger(String inpFromCSV) {
-        int begin = 0, end = inpFromCSV.indexOf(',');
-        while(end != -1)
-        {
-            dataFromString.add(inpFromCSV.substring(begin, end));
-
-            inpFromCSV = inpFromCSV.substring(end + 1);
-            end = inpFromCSV.indexOf(',');
-        }
-        end = inpFromCSV.length();
-        dataFromString.add(inpFromCSV.substring(begin, end));
+        Scanner sc = new Scanner(inpFromCSV).useDelimiter(",");
+        while(sc.hasNext())
+            dataFromString.add(sc.next());
     }
     public void Display() {
         for(fields f : fields.values())
